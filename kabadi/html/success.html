@@ -4,15 +4,13 @@
   <title>レイド成功！！</title>
   <link rel="icon" href="">
   <link rel="stylesheet" href="">
-  <script src=""></script>
+  <script src="../js/score.js"></script>
 </head>
-<body>
+<body onload="scoreDisp();">
   <img src="../media/success.png" alt="レイド成功の図">
   </br>
-  <p1>レイド成功！おめでとう！！</br>
-      3点獲得！！</br>
-  </p1>
+  <div id="score_notice"></div>
   <input type="button" name="replay" value="もう一度遊ぶ" onclick="location.href='index.html'">
-  <input type="button" name="replay" value="同じ設定で遊ぶ" onclick="location.href='game.html'">
+  <input type="button" name="replay" value="同じ設定で遊ぶ" onclick="newGame();">
 </body>
 </html>

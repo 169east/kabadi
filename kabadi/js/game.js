@@ -15,10 +15,10 @@ var bonusFlag = false; //ボーナスが入ったらtrue
 var touchFlag = false; //タッチが入ったらtrue
 
 //キャッチ判定
-var doCatchnum = 0;
+var doCatchnum = 0; //複数人タッチの判定
 
 //コートの広さ
-var coWidth = window.innerWidth*0.75;
+var coWidth = window.innerWidth*0.5;
 var coDepth = coWidth*0.65;
 //ハーフラインの位置
 var liStart = coWidth*0.1;
@@ -26,13 +26,24 @@ var liStart = coWidth*0.1;
 var borkDepth = coWidth*0.375;
 var bonusDepth = coWidth*0.475;
 var lobWidth = coWidth*0.1;
-
+//入力されたレイダータイプ
+var raidType = location.search;
 
 //レイダーのパラメータ設定
-var raidReach = coWidth*0.06;
-var raidHand = raidReach * 0.15;
-var siCatch = raidReach * 0.3;
-var doCatch = raidReach * 0.7;
+var selectT;
+
+var speedT = [0.007,0.06,0.05,0.15,0.25]; //移動速度、方向転換速度、リーチ、手の長さ、捕まりやすさ
+var techT = [0.006,0.07,0.05,0.15,0.25];
+var powerT = [0.0045,0.045,0.06,0.15,0.4];
+var reachT = [0.0045,0.045,0.07,0.2,0.35];
+var balanceT = [0.005,0.05,0.06,0.15,0.3];
+
+var raidSpeed;
+var raidTech;
+var raidReach;
+var raidHand;
+var siCatch;
+var doCatch;
 
 //アンティのパラメータ設定
 var untiReach = coWidth*0.06;
@@ -49,15 +60,48 @@ function setup() {
 	createCanvas(coWidth,coDepth+liStart);
 	//rectMode(CENTER);
 
+	//レイダータイプの取得
+	raidType=int(raidType.substring(1));
+
+	switch (raidType) {
+		case 1:
+			selectT = speedT;
+			break;
+		case 2:
+			selectT = techT;
+			break;
+		case 3:
+			selectT = powerT;
+			break;
+		case 4:
+			selectT = reachT;
+			break;
+		case 5:
+			selectT = balanceT;
+			break;
+	}
+
+	console.log(selectT);
+	console.log(speedT);
+
+	raidSpeed = coWidth*selectT[0];
+	raidTech = selectT[1];
+	raidReach = coWidth*selectT[2];
+	raidHand = raidReach * selectT[3];
+	doCatch = raidReach * selectT[4];
+	siCatch = doCatch * 2;
+
 	/*raider_img = loadImage('../media/raider.png');
 	unti_img = loadImage('../media/unti.png');*/
-	p1 = new raiderObj('red', raidReach, coWidth*0.005, p1controls) //レイダーの作成
-
-	p2 = new untiObj('blue', untiReach, duntiX, duntiY) //アンティの作成
-	p3 = new untiObj('blue', untiReach, duntiX+coWidth*0.1, duntiY)
-	p4 = new untiObj('blue', untiReach, duntiX+coWidth*0.2, duntiY)
-	p5 = new untiObj('blue', untiReach, duntiX-coWidth*0.2, duntiY)
-	p6 = new untiObj('blue', untiReach, duntiX-coWidth*0.1, duntiY)
+	p1 = new raiderObj('red', raidReach, raidSpeed, p1controls) //レイダーの作成
+	//アンティの作成
+	p2 = new untiObj('blue', untiReach, duntiX, duntiY-coWidth*0.02) //センター
+	p3 = new untiObj('blue', untiReach, duntiX+coWidth*0.1, duntiY-coWidth*0.015)
+	p4 = new untiObj('blue', untiReach, duntiX+coWidth*0.2, duntiY-coWidth*0.01)
+	p5 = new untiObj('blue', untiReach, duntiX-coWidth*0.2, duntiY-coWidth*0.01)
+	p6 = new untiObj('blue', untiReach, duntiX-coWidth*0.1, duntiY-coWidth*0.015)
+	p7 = new untiObj('blue', untiReach, duntiX+coWidth*0.3, duntiY+coWidth*0.01)
+	p8 = new untiObj('blue', untiReach, duntiX-coWidth*0.3, duntiY+coWidth*0.01)
 
 	scoreCount();
 	//courtCount();
@@ -110,6 +154,8 @@ function draw(){
 	p1.collide(p4);
 	p1.collide(p5);
 	p1.collide(p6);
+	p1.collide(p7);
+	p1.collide(p8);
 
 	p2.disp();
 	p2.collide(p1);
@@ -121,6 +167,10 @@ function draw(){
 	p5.collide(p1);
 	p6.disp();
 	p6.collide(p1);
+	p7.disp();
+	p7.collide(p1);
+	p8.disp();
+	p8.collide(p1);
 }
 
 function raiderObj(color, sz, speed, controls){
@@ -141,7 +191,7 @@ function raiderObj(color, sz, speed, controls){
 
 	//各種パラメータの設定
 	this.speed = speed; //移動速度
-	this.swordSpeed = 0.05 //方向転換の速度
+	this.swordSpeed = raidTech; //方向転換の速度
 	this.d = sz; //大きさ
 	this.color = color;
 	//this.saveColor = color;
@@ -278,24 +328,24 @@ function raiderObj(color, sz, speed, controls){
 		if(courtFlag==true){
 			if(score > 0){
 				if(this.y < this.d){
-					location.href="failed.html"
+					location.href="failed.html?"+raidType;
 				}else{
 					if(this.y > liStart+coDepth-this.d){
-						location.href="success.html"
+						location.href="success.html?"+score+","+raidType;
 					}
 				}
 			}else{
 				if(this.y > liStart+coDepth-this.d || this.y < this.d){
-					location.href="failed.html"
+					location.href="failed.html?"+raidType
 				}
 			}
 			if(touchFlag == true){//タッチが入ったらロビーを開放
 				if(this.x < this.d || this.x > coWidth-this.d){
-					location.href="failed.html"
+					location.href="failed.html?"+raidType
 				}
 			}else{//タッチ無しならロビー侵入でアウト
 				if(this.x < lobWidth+this.d || this.x > coWidth-lobWidth-this.d){
-					location.href="failed.html"
+					location.href="failed.html?"+raidType
 				}
 			}
 		}
@@ -311,7 +361,7 @@ function raiderObj(color, sz, speed, controls){
 		this.overlap2 = collideCircleCircle(this.x,this.y,this.d-doCatch,enemy.x,enemy.y,enemy.d)
 
 		if(this.overlap == true || doCatchnum > 1){
-			location.href="failed.html"
+			location.href="failed.html?"+raidType;
 		}
 
 		if(this.overlap2 == false){
@@ -351,7 +401,7 @@ function untiObj(color, sz, untiX, untiY){
 
 		this.collide = function(enemy){
 			this.overlap = collideCircleCircle(this.x,this.y,this.d,enemy.x,enemy.y,enemy.d) // are we overlapping with the enemy?
-			this.overlap2 = collideCircleCircle(this.x,this.y,this.d,enemy.x,enemy.y,enemy.d-doCatchnum)
+			this.overlap2 = collideCircleCircle(this.x,this.y,this.d,enemy.x,enemy.y,enemy.d-doCatch)
 			this.hit = collideLineCircle(enemy.x, enemy.y, enemy.linex,enemy.liney,this.x, this.y, this.d);
 			this.hit2 = collideLineCircle(enemy.x, enemy.y, enemy.linex2,enemy.liney2,this.x, this.y, this.d); //sword hitting the other player?
 			if(this.gate == false){
@@ -369,6 +419,9 @@ function untiObj(color, sz, untiX, untiY){
 					this.gate2 = true;
 				}
 			}
+			if(this.overlap2 == false){
+				this.gate2 = false;
+			}
 		}
 	}
 } // close untiObj
@@ -380,12 +433,12 @@ function timeCount(){
 	if(raidTime == 0){
 		if(score >= 1){
 			if(this.y > liStart+coDepth-this.d){
-				location.href="success.html"
+				location.href="success.html?"+score+","+raidType;
 			}else{
-				location.href="failed.html"
+				location.href="failed.html?"+raidType
 			}
 		}else{
-			location.href="failed.html"
+			location.href="failed.html?"+raidType
 		}
 	}
 }
