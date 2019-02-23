@@ -1,0 +1,47 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>キャラ選択</title>
+  <link rel="icon" href="">
+  <link rel="stylesheet" href="">
+  <script src="../js/chara_select.js"></script>
+</head>
+<body>
+  <div class="chara_select">
+    <p1>好きなキャラを選択してください。</br>
+      <form name="chara_select_form" action="" method="post">
+        <select id="chara_list" size="5" onchange="selectboxgraph();">
+          <option value="speed">スピードタイプ</option>
+          <option value="tech">テクニカルタイプ</option>
+          <option value="power">パワータイプ</option>
+          <option value="reach">リーチタイプ</option>
+          <option value="balance">バランスタイプ</option>
+        </select>
+      </form>
+      </br>
+    </p1>
+  </div>
+  <div class="chara_intro">
+    </br>
+    <p1>
+      ◆キャラ紹介◆</br>
+      スピードタイプ：移動速度が速いが捕まりやすい</br>
+      テクニカルタイプ：方向転換が速いが捕まりやすい</br>
+      パワータイプ：敵に囲まれても捕まり辛いが移動・方向転換が遅い</br>
+      リーチタイプ：リーチが長く敵に触りやすいが移動・方向転換が遅い</br>
+      バランスタイプ：上4つに比べて平均的な能力
+      </br>
+    </p1>
+  </div>
+  <div class="chara_status">
+    </br>
+    <p1>◆選択したキャラのステータス◆</p1>
+    </br>
+    <div id="chara_status_graph"></div>
+    </br>
+  </div>
+  <div class="game_start">
+    <input type="button" name="gstart" value="試合開始" onclick="location.href='game.html'"></input>
+    <input type="button" name="gstart" value="試合開始" onclick="selectType();"></input>
+  </div>
+</body>
